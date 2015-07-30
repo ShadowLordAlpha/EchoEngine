@@ -11,8 +11,8 @@ sourceSets {
 
 // Dependencies for the project are stored in the libs directory
 dependencies {
-    compile fileTree(dir: "libs", includes: ["*.jar"])
-    runtime fileTree(dir: "libs", includes: ["*.jar"])
+    compile fileTree(dir: "dependencies", includes: ["*/*.jar"])
+    runtime fileTree(dir: "dependencies", includes: ["*/*.jar"])
 
     // Using this because the resources are in source code
     runtime fileTree(dir: "${projectDir}/src/main/java/", includes: ["*"])
