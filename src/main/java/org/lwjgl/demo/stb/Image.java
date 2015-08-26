@@ -11,6 +11,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.libffi.Closure;
 
+import io.github.cybernetic_shadow.echo.core.SharedLibraryLoader;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -138,6 +140,7 @@ public final class Image {
 	}
 
 	public static void main(String[] args) {
+		SharedLibraryLoader.load();
 		String imagePath;
 		if ( args.length == 0 ) {
 			System.out.println("Use 'ant demo -Dclass=org.lwjgl.demo.stb.Image -Dargs=<path>' to load a different image.\n");

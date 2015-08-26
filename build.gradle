@@ -1,19 +1,32 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-// Source sets in the project, specify source directories
-sourceSets {
-    main {
-        java.srcDir("${projectDir}/src/main/java/")
-        resources.srcDir("${projectDir}/src/main/java/")
-    }
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
-// Dependencies for the project are stored in the libs directory
-dependencies {
-    compile fileTree(dir: "dependencies", includes: ["*/*.jar"])
-    runtime fileTree(dir: "dependencies", includes: ["*/*.jar"])
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+project.ext.lwjglVersion = "3.+"
+project.ext.jomlVersion = "+"
+project.ext.slf4japiVersion = "+"
 
-    // Using this because the resources are in source code
-    runtime fileTree(dir: "${projectDir}/src/main/java/", includes: ["*"])
+dependencies {
+    compile "org.lwjgl:lwjgl:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
+    compile "org.joml:joml:${jomlVersion}"
+    compile "org.slf4j:slf4j-api:${slf4japiVersion}"
+    
+}
+
+jar {
+	baseName = 'EchoEngine'
+	version = '0.0.0a'
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.4'
 }
