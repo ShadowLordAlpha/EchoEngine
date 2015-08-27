@@ -144,7 +144,7 @@ public final class Image {
 		String imagePath;
 		if ( args.length == 0 ) {
 			System.out.println("Use 'ant demo -Dclass=org.lwjgl.demo.stb.Image -Dargs=<path>' to load a different image.\n");
-			imagePath = "menu_image.png";
+			imagePath = "splash-screen.jpg";
 		} else
 			imagePath = args[0];
 		new Image(imagePath).run();

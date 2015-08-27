@@ -1,5 +1,7 @@
 package io.github.cybernetic_shadow.echo.core;
 
+import java.io.File;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
@@ -19,6 +21,16 @@ public class EchoEngine {
 			return;
 		}
 		
+		SplashScreen ss = new SplashScreen(new File("src/main/java/splash-screen.jpg"));
+		new Thread(ss).start();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ss.requestClose();
 		
+		GLFW.glfwTerminate();
 	}
 }
