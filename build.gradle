@@ -11,6 +11,7 @@ targetCompatibility = 1.8
 project.ext.lwjglVersion = "3.+"
 project.ext.jomlVersion = "+"
 project.ext.slf4japiVersion = "+"
+project.ext.slf4jlogVersion = "+"
 
 dependencies {
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
@@ -19,7 +20,7 @@ dependencies {
     compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
     compile "org.joml:joml:${jomlVersion}"
     compile "org.slf4j:slf4j-api:${slf4japiVersion}"
-    
+    compile "org.slf4j:slf4j-simple:${slf4jlogVersion}"
 }
 
 jar {
