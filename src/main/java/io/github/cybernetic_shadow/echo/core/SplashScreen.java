@@ -53,6 +53,7 @@ public class SplashScreen implements Runnable {
 					GLFW.glfwDefaultWindowHints();
 					GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL11.GL_FALSE);
 					GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GL11.GL_FALSE);
+					GLFW.glfwWindowHint(GLFW.GLFW_FLOATING, GL11.GL_TRUE);
 					long window = GLFW.glfwCreateWindow(width.getInt(0), height.getInt(0), "Echo Engine", MemoryUtil.NULL, MemoryUtil.NULL);
 					GLFWvidmode vidmode = new GLFWvidmode(GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()));
 					GLFW.glfwSetWindowPos(window, (vidmode.getWidth() - width.getInt(0)) / 2, (vidmode.getHeight() - height.getInt(0)) / 2);

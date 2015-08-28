@@ -16,8 +16,9 @@ public class EchoEngine {
 		
 		GLFW.glfwInit();
 		
-		SplashScreen splash = new SplashScreen(new File("src/main/java/splash-screen.jpg"));
+		SplashScreen splash = new SplashScreen(new File("src/main/java/splash-screen.png"));
 		new Thread(splash, "Splash Screen").start();
+		
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
@@ -43,7 +44,7 @@ public class EchoEngine {
 		splash.requestClose();
 		GL.createCapabilities(true);
 		
-		GL11.glClearColor(0, 0, 1, 0);
+		GL11.glClearColor(0.0f, 0.3f, 0.0f, 0.0f);
 		
 		// Main Loop
 		while(GLFW.glfwWindowShouldClose(window) == GL11.GL_FALSE) {
