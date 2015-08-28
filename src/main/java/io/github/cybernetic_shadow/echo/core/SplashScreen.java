@@ -32,7 +32,7 @@ public class SplashScreen implements Runnable {
 	
 	@Override
 	public void run() {
-		System.out.println(file.length());
+		
 		if(file.isFile()) {
 			try(FileChannel fc = new FileInputStream(file).getChannel()) {
 				ByteBuffer imageData = JEmalloc.je_calloc(1, file.length() + 1);
@@ -47,6 +47,7 @@ public class SplashScreen implements Runnable {
 				ByteBuffer components = JEmalloc.je_malloc(4);
 				ByteBuffer image;
 				image = STBImage.stbi_load_from_memory(imageData, imageData.remaining(), width, height, components, 0);
+				JEmalloc.je_free(imageData);
 				if(image != null) {
 					// Setup GLFW Window
 					GLFW.glfwDefaultWindowHints();
@@ -57,7 +58,7 @@ public class SplashScreen implements Runnable {
 					GLFW.glfwSetWindowPos(window, (vidmode.getWidth() - width.getInt(0)) / 2, (vidmode.getHeight() - height.getInt(0)) / 2);
 					GLFW.glfwMakeContextCurrent(window);
 					GL.createCapabilities();
-					GLFW.glfwSwapInterval(1);
+					
 					GLFW.glfwShowWindow(window);
 					if(window != MemoryUtil.NULL) {
 						int texID = GL11.glGenTextures();
@@ -110,14 +111,12 @@ public class SplashScreen implements Runnable {
 							GLFW.glfwSwapBuffers(window);
 						}
 						
-						GL.destroy();
 						GLFW.glfwDestroyWindow(window);
 					}
 					STBImage.stbi_image_free(image);
 				}
 				
 				// Delete and free all memory and objects
-				JEmalloc.je_free(imageData);
 				JEmalloc.je_free(width);
 				JEmalloc.je_free(height);
 				JEmalloc.je_free(components);
