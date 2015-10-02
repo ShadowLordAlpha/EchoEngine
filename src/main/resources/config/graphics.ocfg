@@ -1,0 +1,8 @@
+/*
+ * 19/9/2015
+ */
+Configuration {
+	Name {string {""}}
+	Default {}
+	Value {}
+}

@@ -1,22 +1,63 @@
 package io.github.cybernetic_shadow.echo.core;
 
 import java.io.File;
-import java.nio.ByteBuffer;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.github.cybernetic_shadow.echo.graphics.SplashScreen;
 
 public class EchoEngine {
+	
+	private static final Logger logger = LoggerFactory.getLogger(EchoEngine.class);
 
-	public static final void start() {
-		SharedLibraryLoader.load();
+	public static String RELITIVE_PATH_MODIFIER = "";
+	
+	static {
+		File runningJar = new File(EchoEngine.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		System.out.println(runningJar.getAbsolutePath());
+		ClassLoader cl = ClassLoader.getSystemClassLoader();
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+        for(URL url: urls){
+        	System.out.println(url.getFile());
+        }
+		if(runningJar.getName().endsWith(".jar")) {
+			logger.debug("Extracting Jar Resources");
+			
+			// TODO
+			
+			logger.debug("Done Extracting Jar Resources");
+		} else {
+			logger.info("Jar not found!");
+			if(runningJar.getAbsolutePath().endsWith("build\\classes\\main")) {
+				logger.info("Assuming Gradle Dev Enviornment");
+				RELITIVE_PATH_MODIFIER = "build/resources/main/";
+			} else {
+				logger.info("Assuming Basic Dev Enviornment");
+				RELITIVE_PATH_MODIFIER = "bin/";
+			}
+		}
+	}
+	
+	public static final void start(String[] args) {
 		
 		GLFW.glfwInit();
 		
-		SplashScreen splash = new SplashScreen(new File("src/main/java/splash-screen.png"));
+		SplashScreen splash = null;
+		
+		try {
+			splash = new SplashScreen();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		new Thread(splash, "Splash Screen").start();
 		
 		try {
@@ -35,13 +76,17 @@ public class EchoEngine {
 		GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
 		long window = GLFW.glfwCreateWindow(500, 400, "Test 2", MemoryUtil.NULL, MemoryUtil.NULL);
 		
-		ByteBuffer vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+		GLFWvidmode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
 		// Center the window
-		GLFW.glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - 500) / 2, (GLFWvidmode.height(vidmode) - 400) / 2);
+		GLFW.glfwSetWindowPos(window, (vidmode.getWidth() - 500) / 2, (vidmode.getHeight() - 400) / 2);
 		
 		GLFW.glfwMakeContextCurrent(window);
 		GLFW.glfwShowWindow(window);
-		splash.requestClose();
+		try {
+			splash.requestClose();
+		} catch(Exception e) {
+			
+		}
 		GL.createCapabilities(true);
 		
 		GL11.glClearColor(0.0f, 0.3f, 0.0f, 0.0f);
@@ -57,5 +102,11 @@ public class EchoEngine {
 		}
 		
 		GLFW.glfwTerminate();
+	}
+	
+	public static final void start(Game game) {
+		// TODO extract jar resources if needed
+		
+		
 	}
 }
