@@ -8,7 +8,7 @@ repositories {
 }
 
 mainClassName = "io.github.cybernetic_shadow.echo.core.Main"
-applicationDefaultJvmArgs = [""]
+applicationDefaultJvmArgs = ["-tag sla.remarks:a:"Remarks"]
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

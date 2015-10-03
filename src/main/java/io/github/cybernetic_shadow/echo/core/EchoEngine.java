@@ -3,6 +3,7 @@ package io.github.cybernetic_shadow.echo.core;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Date;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWvidmode;
@@ -107,6 +108,45 @@ public class EchoEngine {
 	public static final void start(Game game) {
 		// TODO extract jar resources if needed
 		
+		// TODO create and display window
+		long window = GLFW.glfwCreateWindow(width, height, title, monitor, share);
 		
+		// Core game loop variables
+		double deltaTime = 10; // given in ms
+		
+		double frameStartTime = (double) System.nanoTime() / 1000000.0;
+		double accumulator = 0;
+		
+		// Core game loop
+		while(true) {
+			// Process frame time and start next frame time cycle
+			double frameEndTime = (double) System.nanoTime() / 1000000.0;
+			double frameTime = (frameEndTime - frameStartTime);
+			frameStartTime = frameEndTime;
+			accumulator += frameTime;
+			
+			while(accumulator >= deltaTime) {
+				// Poll user input
+				GLFW.glfwPollEvents();
+				
+				// update game
+				game.update(deltaTime);
+				accumulator -= deltaTime;
+			}
+			
+			// Estimate where the actual physics parts are for this frame as the
+			// physics and render speed are no lock together
+			game.polate(accumulator/deltaTime);
+			
+			// TODO drop frames
+				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+				game.render();
+				GLFW.glfwSwapBuffers(window);
+		}
+		
+		GLFW.glfwHideWindow(window);
+		game.dispose();
+		GLFW.glfwDestroyWindow(window);
+		GLFW.glfwTerminate();
 	}
 }
