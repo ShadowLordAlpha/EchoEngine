@@ -8,7 +8,8 @@ repositories {
 }
 
 mainClassName = "io.github.cybernetic_shadow.echo.core.Main"
-applicationDefaultJvmArgs = ["-tag sla.remarks:a:"Remarks"]
+applicationDefaultJvmArgs = [""]
+javadoc.options.tags = ['sla.remarks:a:Remarks:', 'sla.ts:a:Thread Safety:', 'sla.warn:a:Warning:', 'sla.reen:a:Reentrancy:']
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

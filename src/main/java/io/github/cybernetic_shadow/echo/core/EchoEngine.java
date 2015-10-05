@@ -3,22 +3,21 @@ package io.github.cybernetic_shadow.echo.core;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Date;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.cybernetic_shadow.echo.graphics.SplashScreen;
+import io.github.cybernetic_shadow.echo.graphics.glfw.GLFWapi;
+import io.github.cybernetic_shadow.echo.graphics.glfw.GLFWwindow;
 
 public class EchoEngine {
 	
 	private static final Logger logger = LoggerFactory.getLogger(EchoEngine.class);
-
+	
 	public static String RELITIVE_PATH_MODIFIER = "";
 	
 	static {
@@ -47,78 +46,66 @@ public class EchoEngine {
 		}
 	}
 	
-	public static final void start(String[] args) {
-		
-		GLFW.glfwInit();
-		
-		SplashScreen splash = null;
-		
-		try {
-			splash = new SplashScreen();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		new Thread(splash, "Splash Screen").start();
-		
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		// Splash Screen load and display
-		GLFW.glfwDefaultWindowHints();
-		GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GL11.GL_TRUE);
-		GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
-		GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
-		GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
-		long window = GLFW.glfwCreateWindow(500, 400, "Test 2", MemoryUtil.NULL, MemoryUtil.NULL);
-		
-		GLFWvidmode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-		// Center the window
-		GLFW.glfwSetWindowPos(window, (vidmode.getWidth() - 500) / 2, (vidmode.getHeight() - 400) / 2);
-		
-		GLFW.glfwMakeContextCurrent(window);
-		GLFW.glfwShowWindow(window);
-		try {
-			splash.requestClose();
-		} catch(Exception e) {
-			
-		}
-		GL.createCapabilities(true);
-		
-		GL11.glClearColor(0.0f, 0.3f, 0.0f, 0.0f);
-		
-		// Main Loop
-		while(GLFW.glfwWindowShouldClose(window) == GL11.GL_FALSE) {
-			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-			GLFW.glfwPollEvents();
-			
-			// render
-			
-			GLFW.glfwSwapBuffers(window);
-		}
-		
-		GLFW.glfwTerminate();
-	}
-	
 	public static final void start(Game game) {
 		// TODO extract jar resources if needed
 		
-		// TODO create and display window
-		long window = GLFW.glfwCreateWindow(width, height, title, monitor, share);
+		if(!GLFWapi.glfwInit()) {
+			throw new IllegalStateException("Failed to initialize GLFW!");
+		}
 		
+		game.preInit();
+		
+		SplashScreen splash = null;
+		try {
+			splash = new SplashScreen();
+		} catch (Exception e) {
+			logger.warn("Failed to create Splash Screen: {}", e);
+		}
+		
+		Thread t = new Thread(splash, "Splash-Screen");
+		t.start();
+		GLFWapi.glfwShowWindow(splash.getWindow());
+		
+		game.init();
+		// Setup basic window
+		GLFWapi.glfwDefaultWindowHints();
+		GLFWapi.glfwWindowHint(GLFWapi.GLFW_CONTEXT_VERSION_MAJOR, 3);
+		GLFWapi.glfwWindowHint(GLFWapi.GLFW_CONTEXT_VERSION_MINOR, 3);
+		GLFWapi.glfwWindowHint(GLFWapi.GLFW_OPENGL_FORWARD_COMPAT, true);
+		GLFWapi.glfwWindowHint(GLFWapi.GLFW_OPENGL_PROFILE, GLFWapi.GLFW_OPENGL_CORE_PROFILE);
+		
+		if(splash != null) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			splash.requestClose();
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		game.postInit();
+		// create window
+		GLFWwindow window = GLFWapi.glfwCreateWindow(1024, 768, "Echo Engine", null, null);
+		
+		
+		GLFWapi.glfwMakeContextCurrent(window);
+		GL.createCapabilities();
+		
+		//GLFWapi.glfwSwapInterval(1);
 		// Core game loop variables
-		double deltaTime = 10; // given in ms
+		double deltaTime = 1000/60; // given in ms
 		
 		double frameStartTime = (double) System.nanoTime() / 1000000.0;
 		double accumulator = 0;
 		
 		// Core game loop
-		while(true) {
+		while(!GLFWapi.glfwWindowShouldClose(window)) {
 			// Process frame time and start next frame time cycle
 			double frameEndTime = (double) System.nanoTime() / 1000000.0;
 			double frameTime = (frameEndTime - frameStartTime);
@@ -128,7 +115,6 @@ public class EchoEngine {
 			while(accumulator >= deltaTime) {
 				// Poll user input
 				GLFW.glfwPollEvents();
-				
 				// update game
 				game.update(deltaTime);
 				accumulator -= deltaTime;
@@ -141,12 +127,12 @@ public class EchoEngine {
 			// TODO drop frames
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 				game.render();
-				GLFW.glfwSwapBuffers(window);
+				GLFWapi.glfwSwapBuffers(window);
 		}
 		
-		GLFW.glfwHideWindow(window);
+		GLFWapi.glfwHideWindow(window);
 		game.dispose();
-		GLFW.glfwDestroyWindow(window);
-		GLFW.glfwTerminate();
+		GLFWapi.glfwDestroyWindow(window);
+		GLFWapi.glfwTerminate();
 	}
 }

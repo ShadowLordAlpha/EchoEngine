@@ -9,15 +9,14 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.stb.STBImage;
-import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.system.jemalloc.JEmalloc;
 
 import io.github.cybernetic_shadow.echo.core.EchoEngine;
+import io.github.cybernetic_shadow.echo.graphics.glfw.GLFWapi;
+import io.github.cybernetic_shadow.echo.graphics.glfw.GLFWwindow;
 
 public class SplashScreen implements Runnable {
 
@@ -27,7 +26,7 @@ public class SplashScreen implements Runnable {
 	private int width;
 	private int height;
 	private int components;
-	private boolean close = false;
+	private GLFWwindow window;
 
 	public SplashScreen() throws IOException, URISyntaxException {
 		this(new File(DEFAULT_FILE));
@@ -38,6 +37,8 @@ public class SplashScreen implements Runnable {
 	}
 
 	public SplashScreen(FileChannel fChannel) throws IOException {
+		
+		// Load image to be used as the splash screen
 		ByteBuffer imageData = JEmalloc.je_malloc(fChannel.size() + 1);
 		int read;
 		do {
@@ -58,27 +59,32 @@ public class SplashScreen implements Runnable {
 		JEmalloc.je_free(imagePart);
 		
 		image = memByteBuffer(__result, width * height * components);
+		
+		// Create hidden window to display splash screen
+		// reset all hints to set needed hints
+		GLFWapi.glfwDefaultWindowHints();
+		GLFWapi.glfwWindowHint(GLFWapi.GLFW_VISIBLE, false);
+		GLFWapi.glfwWindowHint(GLFWapi.GLFW_DECORATED, false);
+		
+		window = GLFWapi.glfwCreateWindow(width, height, "Echo Engine", null, null);
+		
+		// TODO center window
+		GLFWapi.glfwSetWindowPos(window, 0, 0);
+		
 	}
 
 	public void requestClose() {
-		close = true;
+		GLFWapi.glfwSetWindowShouldClose(window, true);
+		GLFWapi.glfwHideWindow(window);
 	}
 
 	@Override
 	public void run() {
-		// Setup GLFW Window
-		GLFW.glfwDefaultWindowHints();
-		GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GL11.GL_FALSE);
-		GLFW.glfwWindowHint(GLFW.GLFW_FLOATING, GL11.GL_TRUE);
-		long window = GLFW.glfwCreateWindow(width, height, "Echo Engine", MemoryUtil.NULL, MemoryUtil.NULL);
-		GLFWvidmode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-		GLFW.glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
-		GLFW.glfwMakeContextCurrent(window);
+		
+		GLFWapi.glfwMakeContextCurrent(window);
 		GL.createCapabilities();
-
-		GLFW.glfwShowWindow(window);
-		if (window != MemoryUtil.NULL) {
+		
+		if (window != null) {
 			int texID = GL11.glGenTextures();
 
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texID);
@@ -103,7 +109,7 @@ public class SplashScreen implements Runnable {
 			GL11.glViewport(0, 0, width, height);
 
 			// Main Render Loop
-			while (!close) {
+			while (!GLFWapi.glfwWindowShouldClose(window)) {
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
 				GL11.glPushMatrix();
@@ -126,12 +132,17 @@ public class SplashScreen implements Runnable {
 
 				GL11.glPopMatrix();
 
-				GLFW.glfwSwapBuffers(window);
-			}
-
-			GLFW.glfwDestroyWindow(window);
+				GLFWapi.glfwSwapBuffers(window);
+			}			
 		}
 		
+		GLFWapi.glfwDestroyWindow(window);
 		STBImage.stbi_image_free(image);
+		image = null;
+		window = null;
+	}
+
+	public GLFWwindow getWindow() {
+		return window;
 	}
 }
