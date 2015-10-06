@@ -66,7 +66,6 @@ public class EchoEngine {
 		t.start();
 		GLFWapi.glfwShowWindow(splash.getWindow());
 		
-		game.init();
 		// Setup basic window
 		GLFWapi.glfwDefaultWindowHints();
 		GLFWapi.glfwWindowHint(GLFWapi.GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -74,13 +73,16 @@ public class EchoEngine {
 		GLFWapi.glfwWindowHint(GLFWapi.GLFW_OPENGL_FORWARD_COMPAT, true);
 		GLFWapi.glfwWindowHint(GLFWapi.GLFW_OPENGL_PROFILE, GLFWapi.GLFW_OPENGL_CORE_PROFILE);
 		
+		// create window
+		GLFWwindow window = GLFWapi.glfwCreateWindow(1024, 768, "Echo Engine", null, null);
+		
+		
+		GLFWapi.glfwMakeContextCurrent(window);
+		GL.createCapabilities();
+		
+		game.init();
+		
 		if(splash != null) {
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			splash.requestClose();
 			try {
 				t.join();
@@ -89,14 +91,8 @@ public class EchoEngine {
 			}
 		}
 		
+		// TODO show window
 		game.postInit();
-		// create window
-		GLFWwindow window = GLFWapi.glfwCreateWindow(1024, 768, "Echo Engine", null, null);
-		
-		
-		GLFWapi.glfwMakeContextCurrent(window);
-		GL.createCapabilities();
-		
 		//GLFWapi.glfwSwapInterval(1);
 		// Core game loop variables
 		double deltaTime = 1000/60; // given in ms
@@ -114,7 +110,7 @@ public class EchoEngine {
 			
 			while(accumulator >= deltaTime) {
 				// Poll user input
-				GLFW.glfwPollEvents();
+				GLFW.glfwPollEvents(); 
 				// update game
 				game.update(deltaTime);
 				accumulator -= deltaTime;
