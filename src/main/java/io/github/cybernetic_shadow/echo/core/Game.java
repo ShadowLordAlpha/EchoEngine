@@ -2,6 +2,8 @@ package io.github.cybernetic_shadow.echo.core;
 
 import java.io.File;
 
+import org.lwjgl.opengl.GL11;
+
 import io.github.cybernetic_shadow.echo.graphics.Loader;
 import io.github.cybernetic_shadow.echo.graphics.ModelTexture;
 import io.github.cybernetic_shadow.echo.graphics.RawModel;
@@ -26,8 +28,9 @@ public class Game {
 		float[] textCoords = {0, 0, 0, 1, 1, 1, 1, 0};
 		int[] indices = {0, 1, 3, 3, 1, 2};
 		RawModel model = loader.loadToVAO(vertices, textCoords, indices);
-		ModelTexture text = new ModelTexture(loader.loadTexture(new File(EchoEngine.RELITIVE_PATH_MODIFIER + "textures/fern.png")));
+		ModelTexture text = new ModelTexture(loader.loadTexture(new File(EchoEngine.RELITIVE_PATH_MODIFIER + "textures/AncientHopscotch.png")));
 		this.model = new TexturedModel(model, text);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 	}
 
 	public void postInit() {

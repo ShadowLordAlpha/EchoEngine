@@ -4,7 +4,6 @@ import static org.lwjgl.system.MemoryUtil.memAddress;
 import static org.lwjgl.system.MemoryUtil.memByteBuffer;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -37,6 +36,7 @@ public class Loader {
 	}
 
 	public int loadTexture(File file) {
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		FileChannel fChannel;
 		try {
 			fChannel = FileChannel.open(file.toPath());
@@ -62,6 +62,7 @@ public class Loader {
 			JEmalloc.je_free(imagePart);
 
 			ByteBuffer image = memByteBuffer(__result, width * height * components);
+			
 			int textureID = GL11.glGenTextures();
 			
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
@@ -73,6 +74,9 @@ public class Loader {
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			}
+			
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			
 			//JEmalloc.je_free(image); // ????
 			

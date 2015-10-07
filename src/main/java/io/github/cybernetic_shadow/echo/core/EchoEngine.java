@@ -80,6 +80,8 @@ public class EchoEngine {
 		GLFWapi.glfwMakeContextCurrent(window);
 		GL.createCapabilities();
 		
+		GL11.glViewport(0, 0, 1024, 768);
+		GL11.glClearColor(0.4f, 1.0f, 0.5f, 1.0f);
 		game.init();
 		
 		if(splash != null) {

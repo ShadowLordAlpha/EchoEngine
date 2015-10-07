@@ -100,7 +100,7 @@ public class SplashScreen implements Runnable {
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
+		//	GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
