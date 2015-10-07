@@ -3,12 +3,18 @@ package io.github.cybernetic_shadow.echo.graphics;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.FloatBuffer;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 public abstract class ShaderProgram {
 
+	private static FloatBuffer worker = BufferUtils.createFloatBuffer(16);
+	
 	private int programID;
 	private int vertexShaderID;
 	private int fragmentShaderID;
@@ -22,6 +28,30 @@ public abstract class ShaderProgram {
 		bindAttribs();
 		GL20.glLinkProgram(programID);
 		GL20.glValidateProgram(programID);
+		getAllUniformLocations();
+	}
+	
+	protected abstract void getAllUniformLocations();
+	
+	protected int getUniformLocation(String uniformName) {
+		return GL20.glGetUniformLocation(programID, uniformName);
+	}
+	
+	protected void loadFloat(int location, float value) {
+		GL20.glUniform1f(location, value);
+	}
+	
+	protected void loadVector(int location, Vector3f value) {
+		GL20.glUniform3f(location, value.x, value.y, value.z);
+	}
+	
+	protected void loadBoolean(int location, boolean value) {
+		GL20.glUniform1f(location, (value) ? 1 : 0);
+	}
+	
+	protected void loadMatrix(int location, Matrix4f value) {
+		value.get(worker);
+		GL20.glUniformMatrix4fv(location, false, worker);
 	}
 	
 	public void start() {

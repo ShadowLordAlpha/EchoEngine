@@ -22,11 +22,11 @@ public class EchoEngine {
 	
 	static {
 		File runningJar = new File(EchoEngine.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-		System.out.println(runningJar.getAbsolutePath());
+		//System.out.println(runningJar.getAbsolutePath());
 		ClassLoader cl = ClassLoader.getSystemClassLoader();
         URL[] urls = ((URLClassLoader)cl).getURLs();
         for(URL url: urls){
-        	System.out.println(url.getFile());
+        	//System.out.println(url.getFile());
         }
 		if(runningJar.getName().endsWith(".jar")) {
 			logger.debug("Extracting Jar Resources");
@@ -49,36 +49,38 @@ public class EchoEngine {
 	public static final void start(Game game) {
 		// TODO extract jar resources if needed
 		
-		if(!GLFWapi.glfwInit()) {
-			throw new IllegalStateException("Failed to initialize GLFW!");
-		}
-		
+		logger.debug("Pre-Initialization");
 		game.preInit();
 		
-		SplashScreen splash = null;
-		try {
-			splash = new SplashScreen();
-		} catch (Exception e) {
-			logger.warn("Failed to create Splash Screen: {}", e);
+		logger.debug("Initializing GLFW");
+		if(!GLFWapi.glfwInit()) {
+			logger.error("Failed to initialize GLFW!");
+			System.exit(-1);
 		}
 		
-		Thread t = new Thread(splash, "Splash-Screen");
-		t.start();
-		GLFWapi.glfwShowWindow(splash.getWindow());
-		
-		// Setup basic window
-		GLFWapi.glfwDefaultWindowHints();
-		GLFWapi.glfwWindowHint(GLFWapi.GLFW_CONTEXT_VERSION_MAJOR, 3);
-		GLFWapi.glfwWindowHint(GLFWapi.GLFW_CONTEXT_VERSION_MINOR, 3);
-		GLFWapi.glfwWindowHint(GLFWapi.GLFW_OPENGL_FORWARD_COMPAT, true);
-		GLFWapi.glfwWindowHint(GLFWapi.GLFW_OPENGL_PROFILE, GLFWapi.GLFW_OPENGL_CORE_PROFILE);
+		logger.debug("Setting up Window");
+		game.setupWindow();
 		
 		// create window
 		GLFWwindow window = GLFWapi.glfwCreateWindow(1024, 768, "Echo Engine", null, null);
 		
+		if(window == null) {
+			logger.error("Failed to Create GLFW Window!");
+			System.exit(-1);
+		}
 		
 		GLFWapi.glfwMakeContextCurrent(window);
 		GL.createCapabilities();
+		
+		
+		SplashScreen splash = null;
+		try {
+			splash = new SplashScreen();
+			new Thread(splash, "Splash-Screen").start();
+			GLFWapi.glfwShowWindow(splash.getWindow());
+		} catch (Exception e) {
+			logger.warn("Failed to Properly Create Splash Screen: {}", e);
+		}
 		
 		GL11.glViewport(0, 0, 1024, 768);
 		GL11.glClearColor(0.4f, 1.0f, 0.5f, 1.0f);
@@ -86,13 +88,9 @@ public class EchoEngine {
 		
 		if(splash != null) {
 			splash.requestClose();
-			try {
-				t.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 		
+		GLFWapi.glfwShowWindow(window);
 		// TODO show window
 		game.postInit();
 		//GLFWapi.glfwSwapInterval(1);
