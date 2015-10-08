@@ -30,4 +30,11 @@ public class Maths {
 		
 		return dest;
 	}
+	
+	public static Matrix4f createViewmatrix(Matrix4f dest, Camera camera) {
+		dest.identity();
+		dest.rotateXYZ(camera.getPitch(), camera.getYaw(), camera.getRoll());
+		dest.translate(camera.getPosition().negate(new Vector3f()));
+		return dest;
+	}
 }

@@ -1166,7 +1166,7 @@ public final class GLFWapi {
 	}
 
 	public static int glfwGetKey(GLFWwindow window, int key) {
-		return 0;
+		return GLFW.glfwGetKey(window.address(), key);
 	}
 
 	public static int glfwGetMouseButton(GLFWwindow window, int button) {

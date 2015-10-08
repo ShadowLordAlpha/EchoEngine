@@ -19,6 +19,7 @@ public class EchoEngine {
 	private static final Logger logger = LoggerFactory.getLogger(EchoEngine.class);
 	
 	public static String RELITIVE_PATH_MODIFIER = "";
+	private static GLFWwindow window;
 	
 	static {
 		File runningJar = new File(EchoEngine.class.getProtectionDomain().getCodeSource().getLocation().getPath());
@@ -62,7 +63,7 @@ public class EchoEngine {
 		game.setupWindow();
 		
 		// create window
-		GLFWwindow window = GLFWapi.glfwCreateWindow(1024, 768, "Echo Engine", null, null);
+		window = GLFWapi.glfwCreateWindow(1024, 768, "Echo Engine", null, null);
 		
 		if(window == null) {
 			logger.error("Failed to Create GLFW Window!");
@@ -130,5 +131,9 @@ public class EchoEngine {
 		game.dispose();
 		GLFWapi.glfwDestroyWindow(window);
 		GLFWapi.glfwTerminate();
+	}
+	
+	public static GLFWwindow getWindow() {
+		return window;
 	}
 }
